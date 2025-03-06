@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etho - AI Bot</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .spinner-border {
+            border-top-color: transparent;
+            border-right-color: transparent;
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center px-4 pt-6">
+    
+    <!-- Header and Input -->
+    <div class="bg-gray-800 p-4 rounded shadow-md w-full max-w-2xl flex flex-col">
+        <h1 class="text-3xl font-bold text-center mb-2">Etho</h1>
+        <h2 class="text-lg text-gray-300 text-center mb-4">Created by Aryan Sharma</h2>
+
+        <div class="flex items-center gap-2">
+            <textarea id="prompt-input" rows="2" class="w-full p-3 border border-gray-600 rounded bg-gray-700 text-white placeholder-gray-400 resize-none" placeholder="Type a message..."></textarea>
+            <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" onclick="generateText()">Send</button>
+        </div>
+
+        <div class="flex flex-wrap gap-2 justify-center mt-2">
+            <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded w-full sm:w-auto" onclick="generateImage()">Generate Image</button>
+            <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded w-full sm:w-auto" onclick="refreshPage()">Refresh</button>
+        </div>
+
+        <div id="spinner" class="spinner-border border-4 border-blue-500 w-8 h-8 my-4 rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Chat Display -->
+    <div id="result" class="mt-4 bg-gray-800 p-4 rounded shadow-md w-full max-w-2xl text-white overflow-auto max-h-[65vh] min-h-[50vh]"></div>
+
+    <script>
+        const API_KEYS = {
+            text: "v1-Z0FBQUFBQm54SDVweTFCV3FrVjQwNFUydTdxUUhOVVlZZnZ3Nm5UZ3c1cWhxMkNuUUVEdHY5bjdMV3NMYVlQTUR4TmJNeXlFT0JreUpsQmZmXzFpNjNfdzNreVpmZHJwUVE9PQ==",
+            image: "v1-Z0FBQUFBQm54SDVwNnpicDJCcmU2YVhwTVZYZURxMHRORG5fMk1sUXVXVHFFN3VDNVdnWVJ2OFVOUGJBUFFzVW9JcXJOUk5SdnpVdXRaSUd2T3AtVjI4X1BfMXdLeGZYY2c9PQ=="
+        };
+
+        const resultContainer = document.getElementById('result');
+
+        async function generateText() {
+            const prompt = document.getElementById('prompt-input').value.trim();
+            if (!prompt) return alert('Please enter a message.');
+
+            toggleSpinner(true);
+            appendMessage("You", prompt, "right");
+
+            document.getElementById('prompt-input').value = ''; 
+
+            // Check for predefined responses first
+            const responseText = checkPredefinedResponses(prompt);
+            if (responseText) {
+                appendMessage("Etho", responseText, "left", true);
+                toggleSpinner(false);
+                return;
+            }
+
+            // Otherwise, call the API
+            try {
+                const response = await fetch(`https://backend.buildpicoapps.com/aero/run/llm-api?pk=${API_KEYS.text}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+                if (data.status === 'success' && data.text) {
+                    appendMessage("Etho", data.text, "left", true);
+                } else {
+                    appendMessage("Error", "No response received.", "left", "text-red-500");
+                }
+            } catch (error) {
+                appendMessage("Error", "An error occurred. Please try again.", "left", "text-red-500");
+            } finally {
+                toggleSpinner(false);
+                autoScroll();
+            }
+        }
+
+        async function generateImage() {
+            const prompt = document.getElementById('prompt-input').value.trim();
+            if (!prompt) return alert('Please enter a prompt.');
+
+            toggleSpinner(true);
+            appendMessage("You", `Generate an image of: ${prompt}`, "right");
+
+            try {
+                const response = await fetch(`https://backend.buildpicoapps.com/aero/run/image-generation-api?pk=${API_KEYS.image}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    const imageUrl = data.imageUrl;
+                    resultContainer.innerHTML += `
+                        <div class="mt-2 p-2 bg-gray-600 rounded">
+                            <img src="${imageUrl}" alt="Generated Image" class="mt-2 rounded">
+                            <button onclick="downloadImage('${imageUrl}')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-2">Download</button>
+                        </div>
+                    `;
+                } else {
+                    appendMessage("Error", "Failed to generate image.", "left", "text-red-500");
+                }
+            } catch (error) {
+                appendMessage("Error", "An error occurred. Please try again.", "left", "text-red-500");
+            } finally {
+                toggleSpinner(false);
+                autoScroll();
+            }
+        }
+
+        function checkPredefinedResponses(prompt) {
+            const lowerPrompt = prompt.toLowerCase();
+
+            const responses = {
+                name: "My name is Etho.",
+                creator: "My creator and developer is Aryan Sharma."
+            };
+
+            const nameKeywords = ["what is your name", "who are you", "tell me your name"];
+            const creatorKeywords = ["who is your creator", "who created you", "who made you", "who is your developer", "who programmed you"];
+
+            if (nameKeywords.some(q => lowerPrompt.includes(q))) return responses.name;
+            if (creatorKeywords.some(q => lowerPrompt.includes(q))) return responses.creator;
+
+            return null;
+        }
+
+        function appendMessage(sender, message, align, showCopy = false) {
+            let copyButton = showCopy ? `<button onclick="copyText(this)" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-sm ml-2">Copy</button>` : "";
+            resultContainer.innerHTML += `
+                <div class="flex justify-${align} items-center mt-2">
+                    <p class="bg-gray-700 text-gray-300 p-2 rounded">${sender}: ${message}</p>
+                    ${copyButton}
+                </div>
+            `;
+            autoScroll();
+        }
+
+        function refreshPage() {
+            document.getElementById('prompt-input').value = '';
+            resultContainer.innerHTML = '';
+        }
+
+        function toggleSpinner(show) {
+            document.getElementById('spinner').style.display = show ? 'block' : 'none';
+        }
+
+        function autoScroll() {
+            setTimeout(() => {
+                resultContainer.scrollTop = resultContainer.scrollHeight;
+            }, 100);
+        }
+
+        function copyText(button) {
+            const text = button.previousElementSibling.innerText.replace("Etho: ", "");
+            navigator.clipboard.writeText(text).then(() => {
+                button.innerText = "Copied!";
+                setTimeout(() => button.innerText = "Copy", 2000);
+            });
+        }
+
+        function downloadImage(url) {
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "generated-image.jpg";
+            link.click();
+        }
+    </script>
+</body>
+</html>
