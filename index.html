@@ -4,6 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Etho</title>
+
+<meta name="theme-color" content="#1f2937">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4712/4712027.png">
+
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet" />
 <style>
   .spinner {
@@ -154,7 +159,6 @@
   <h1 class="text-3xl font-bold text-center">Etho</h1>
   <h2 class="text-lg text-gray-300 text-center mb-4">Created by Aryan Sharma</h2>
 
-  <!-- Input Box with Send Button -->
   <div class="flex items-center gap-2">
     <textarea
       id="prompt-input"
@@ -164,7 +168,6 @@
     <button onclick="generateText()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded text-sm">?</button>
   </div>
 
-  <!-- Buttons (Generate Image, Talk, Info & Clear Chat) -->
   <div class="flex justify-between mt-2">
     <div>
       <button onclick="generateImage()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-sm">Generate Image</button>
@@ -177,13 +180,10 @@
   <div id="spinner" class="spinner mx-auto mt-4"></div>
 </div>
 
-<!-- Notification Box -->
 <div id="notification" class="notification"></div>
 
-<!-- Response Container -->
 <div id="result" class="mt-4 bg-gray-800 p-4 rounded shadow-md w-full max-w-2xl overflow-auto max-h-[65vh] min-h-[50vh]"></div>
 
-<!-- Voice Assistant Modal -->
 <div id="voiceModal" role="dialog" aria-modal="true" aria-labelledby="voiceModalLabel" aria-describedby="voiceModalDesc">
   <div id="voiceModalHeader" id="voiceModalLabel">Etho Voice Assistant</div>
   <div id="voiceInputContainer">
@@ -199,7 +199,6 @@
   <div id="voiceResponse" aria-live="polite" aria-atomic="true" tabindex="0"></div>
 </div>
 
-<!-- Info Note Box -->
 <div id="infoNote" role="alert" aria-live="polite">
   The voice model can talk in the voice of male and female according to your question, and it is hard to build an AI voice assistant. Thanks to my friends who work at OpenAI for helping me build the voice model of Etho AI.
 </div>
@@ -516,6 +515,15 @@
         infoNote.style.display = 'none';
       }, 8000);
     }
+  }
+  
+  // REGISTER SERVICE WORKER
+  if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+              .then(reg => console.log('SW Registered'))
+              .catch(err => console.log('SW Failed', err));
+      });
   }
 </script>
 
