@@ -2,7 +2,7 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>Etho AI</title>
     <meta name="theme-color" content="#131314">
     
@@ -27,17 +27,16 @@
             background-color: #131314;
             color: #e3e3e3;
             -webkit-tap-highlight-color: transparent;
+            /* Prevent bouncing on iOS */
+            overscroll-behavior-y: none;
         }
 
-        /* Smooth Layout Transitions */
         .layout-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 4px; }
 
-        /* Chat Bubbles */
         .message-user {
             background-color: #2563eb; 
             color: white;
@@ -61,7 +60,6 @@
             font-size: 0.95rem;
         }
 
-        /* Typing Animation */
         .typing-indicator span {
             display: inline-block;
             width: 6px;
@@ -80,10 +78,9 @@
     </style>
 </head>
 
-<body class="h-[100dvh] flex overflow-hidden font-sans">
+<body class="h-[100dvh] flex overflow-hidden font-sans bg-[#131314]">
 
     <aside id="sidebar" class="layout-transition fixed inset-y-0 left-0 z-50 w-72 bg-[#1e1f20] transform flex flex-col justify-between p-4 border-r border-gray-800 -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none">
-        
         <div class="space-y-6">
             <div class="flex items-center justify-between mb-4">
                 <span class="font-bold text-lg text-gray-200 pl-2">Etho AI</span>
@@ -91,12 +88,10 @@
                     <i class="fas fa-chevron-left"></i>
                 </button>
             </div>
-
             <button onclick="window.location.reload()" class="w-full flex items-center space-x-3 px-4 py-3 bg-[#2d2e2f] hover:bg-[#3d3e3f] rounded-full transition text-sm font-medium text-gray-200 active:scale-95 transform">
                 <i class="fas fa-plus text-gray-400"></i>
                 <span>New chat</span>
             </button>
-
             <div class="mt-4">
                 <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Explore</div>
                 <button onclick="openFeatures()" class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-[#2d2e2f] rounded-lg transition flex items-center gap-3 group active:bg-gray-800">
@@ -107,7 +102,6 @@
                 </button>
             </div>
         </div>
-
         <div class="space-y-1 border-t border-gray-700 pt-2">
             <button onclick="window.location.reload()" class="w-full flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:bg-[#2d2e2f] rounded-lg transition active:bg-gray-800">
                 <i class="fas fa-trash-alt w-5"></i>
@@ -124,13 +118,11 @@
 
     <main id="mainContent" class="layout-transition flex-1 flex flex-col h-full md:ml-72 relative w-full bg-[#131314]">
         
-        <div class="p-3 md:p-4 flex items-center justify-between sticky top-0 bg-[#131314]/95 backdrop-blur z-20 border-b border-gray-800 md:border-none">
+        <div class="p-3 md:p-4 flex items-center justify-between bg-[#131314]/95 backdrop-blur z-20 border-b border-gray-800 md:border-none flex-shrink-0">
             <div class="flex items-center space-x-3">
-                
                 <button onclick="toggleSidebar()" class="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-800 transition active:scale-90">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
-                
                 <div class="flex items-center gap-2 select-none">
                     <img src="https://cdn-icons-png.flaticon.com/512/2103/2103832.png" alt="Etho AI Logo" class="w-8 h-8 object-contain">
                     <h1 class="text-lg md:text-xl font-semibold text-gray-100 tracking-tight">Etho AI</h1>
@@ -138,7 +130,7 @@
             </div>
         </div>
 
-        <div id="chat-container" class="flex-grow overflow-y-auto p-4 pb-32 md:px-20 lg:px-40 flex flex-col space-y-6 scroll-smooth">
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:px-20 lg:px-40 flex flex-col space-y-6 scroll-smooth">
             <div id="welcome-message" class="message-ai mt-4 md:mt-10">
                 <div class="flex items-center gap-3 mb-4">
                      <img src="https://cdn-icons-png.flaticon.com/512/2103/2103832.png" alt="Logo" class="w-12 h-12 object-contain animate-pulse">
@@ -148,7 +140,7 @@
             </div>
         </div>
 
-        <div class="fixed bottom-0 left-0 w-full md:static md:w-auto p-2 md:p-6 bg-[#131314] z-30 border-t border-gray-800 md:border-none">
+        <div class="p-2 md:p-6 bg-[#131314] z-30 border-t border-gray-800 md:border-none flex-shrink-0">
             <div class="max-w-4xl mx-auto relative bg-[#1e1f20] rounded-3xl border border-gray-700 hover:border-gray-600 transition-colors shadow-lg">
                 <div class="flex items-center px-2 py-1 md:py-2">
                     <input id="prompt" type="text" placeholder="Message Etho AI..." autocomplete="off"
@@ -172,9 +164,7 @@
         <div class="bg-[#1e1f20] border border-gray-700 rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-100">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-white">Settings</h2>
-                <button onclick="closeSettings()" class="text-gray-400 hover:text-white p-2">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <button onclick="closeSettings()" class="text-gray-400 hover:text-white p-2"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="p-4 bg-[#2d2e2f] rounded-xl border border-gray-700 text-center">
                 <i class="fas fa-wrench text-blue-400 text-2xl mb-3"></i>
@@ -187,10 +177,8 @@
     <div id="featuresModal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-[#1e1f20] border border-gray-700 rounded-2xl w-full max-w-md p-6 shadow-2xl transform transition-all scale-100">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-white">Etho AI Features</h2>
-                <button onclick="closeFeatures()" class="text-gray-400 hover:text-white p-2">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <h2 class="text-xl font-bold text-white">Features</h2>
+                <button onclick="closeFeatures()" class="text-gray-400 hover:text-white p-2"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="space-y-3">
                 <div class="flex items-center gap-3 p-3 bg-[#2d2e2f] rounded-lg border border-gray-700">
@@ -219,69 +207,40 @@
             const textBtn = document.getElementById('textBtn');
             const imgBtn = document.getElementById('imgBtn');
             const welcomeMessage = document.getElementById('welcome-message');
-            const settingsModal = document.getElementById('settingsModal');
-            const featuresModal = document.getElementById('featuresModal');
+            
+            let isDesktopSidebarOpen = true;
 
             const LOGO_URL = "https://cdn-icons-png.flaticon.com/512/2103/2103832.png";
             const API_TEXT = 'https://backend.buildpicoapps.com/aero/run/llm-api?pk=v1-Z0FBQUFBQnBTOHRUbklTeGdKR3M2TXhCR0xfNjRNWDlTMG51cTRkczl1dzFHQVRHX3RtYmhPSnVtQ1ZTbGY3ZzdINHdlYkZyamR2QW5zZDVaS053S2xrOEoyRWx5NFh4S0E9PQ==';
             const API_IMAGE = 'https://backend.buildpicoapps.com/aero/run/image-generation-api?pk=v1-Z0FBQUFBQnBTOHRUTUUtUmltRjcxN0V6QU5zVmpxeVNPTzRzR0FVLTRpcUIwaHlTQmF1VHk1cm9mdXJSVmtfRXJQR3FwVm9US1h5WTlGSzZiRzhjMXdTNXJmUzVyQkNEeWc9PQ==';
 
-            let isDesktopSidebarOpen = true;
-
-            // --- ROBUST SIDEBAR TOGGLE ---
             window.toggleSidebar = function() {
                 const isMobile = window.innerWidth < 768;
-
                 if (isMobile) {
-                    // Mobile: Just toggle translation and overlay
                     sidebar.classList.toggle('-translate-x-full');
                     overlay.classList.toggle('hidden');
                 } else {
-                    // Desktop: Explicitly Handle Margin and Position
                     if (isDesktopSidebarOpen) {
-                        // Close Sidebar on Desktop
                         sidebar.classList.remove('md:translate-x-0');
-                        sidebar.classList.add('-translate-x-full'); // Hide it
-                        
-                        mainContent.classList.remove('md:ml-72'); // Remove margin
-                        mainContent.classList.add('ml-0'); // Full width
+                        sidebar.classList.add('-translate-x-full');
+                        mainContent.classList.remove('md:ml-72');
+                        mainContent.classList.add('ml-0');
                         isDesktopSidebarOpen = false;
                     } else {
-                        // Open Sidebar on Desktop
                         sidebar.classList.add('md:translate-x-0');
-                        sidebar.classList.remove('-translate-x-full'); // Show it
-                        
-                        mainContent.classList.add('md:ml-72'); // Add margin
+                        sidebar.classList.remove('-translate-x-full');
+                        mainContent.classList.add('md:ml-72');
                         mainContent.classList.remove('ml-0');
                         isDesktopSidebarOpen = true;
                     }
                 }
             }
 
-            // --- Window Resize Reset ---
-            window.addEventListener('resize', () => {
-                if (window.innerWidth >= 768) {
-                    // Reset to default desktop state (Open)
-                    overlay.classList.add('hidden');
-                    sidebar.classList.remove('-translate-x-full');
-                    sidebar.classList.add('md:translate-x-0');
-                    mainContent.classList.add('md:ml-72');
-                    mainContent.classList.remove('ml-0');
-                    isDesktopSidebarOpen = true;
-                } else {
-                    // Reset to default mobile state (Closed)
-                    sidebar.classList.add('-translate-x-full');
-                    sidebar.classList.remove('md:translate-x-0');
-                    mainContent.classList.remove('md:ml-72');
-                    mainContent.classList.remove('ml-0');
-                }
-            });
+            window.openSettings = function() { document.getElementById('settingsModal').classList.remove('hidden'); }
+            window.closeSettings = function() { document.getElementById('settingsModal').classList.add('hidden'); }
+            window.openFeatures = function() { document.getElementById('featuresModal').classList.remove('hidden'); }
+            window.closeFeatures = function() { document.getElementById('featuresModal').classList.add('hidden'); }
 
-            // --- Modals ---
-            window.openSettings = function() { settingsModal.classList.remove('hidden'); }
-            window.closeSettings = function() { settingsModal.classList.add('hidden'); }
-            window.openFeatures = function() { featuresModal.classList.remove('hidden'); }
-            window.closeFeatures = function() { featuresModal.classList.add('hidden'); }
             window.copyResponse = function(btn) {
                 const text = btn.parentElement.previousElementSibling.innerText;
                 navigator.clipboard.writeText(text).then(() => {
@@ -291,53 +250,30 @@
                 });
             }
 
-            // --- Chat Logic ---
             function scrollToBottom() { setTimeout(() => chatContainer.scrollTop = chatContainer.scrollHeight, 50); }
 
             function addMessage(htmlContent, type) {
                 const div = document.createElement('div');
                 div.className = type === 'user' ? 'message-user' : 'message-ai';
                 if (type === 'ai') {
-                    div.innerHTML = `
-                        <div class="flex items-start gap-3 w-full">
-                            <img src="${LOGO_URL}" class="w-8 h-8 object-contain mt-1 flex-shrink-0">
-                            <div class="flex-1 min-w-0 overflow-hidden">
-                                <div class="font-bold text-gray-300 mb-1 text-sm">Etho AI</div>
-                                <div class="text-gray-100 leading-relaxed break-words whitespace-pre-wrap">${htmlContent}</div>
-                                <div class="mt-2 flex items-center">
-                                    <button onclick="copyResponse(this)" class="text-gray-500 hover:text-gray-300 text-xs flex items-center gap-1 p-1 rounded hover:bg-gray-800 transition"><i class="far fa-copy"></i> Copy</button>
-                                </div>
-                            </div>
-                        </div>`;
-                } else {
-                    div.innerHTML = htmlContent;
-                }
-                chatContainer.appendChild(div);
-                scrollToBottom();
-                return div;
+                    div.innerHTML = `<div class="flex items-start gap-3 w-full"><img src="${LOGO_URL}" class="w-8 h-8 object-contain mt-1 flex-shrink-0"><div class="flex-1 min-w-0"><div class="font-bold text-gray-300 mb-1 text-sm">Etho AI</div><div class="text-gray-100 leading-relaxed break-words whitespace-pre-wrap">${htmlContent}</div><div class="mt-2 flex items-center"><button onclick="copyResponse(this)" class="text-gray-500 hover:text-gray-300 text-xs flex items-center gap-1 p-1 rounded hover:bg-gray-800 transition"><i class="far fa-copy"></i> Copy</button></div></div></div>`;
+                } else div.innerHTML = htmlContent;
+                chatContainer.appendChild(div); scrollToBottom();
             }
 
             function showLoading() {
-                const div = document.createElement('div');
-                div.className = 'message-ai';
+                const div = document.createElement('div'); div.className = 'message-ai';
                 div.innerHTML = `<div class="flex items-start gap-3"><img src="${LOGO_URL}" class="w-8 h-8 object-contain mt-1"><div class="typing-indicator p-2 mt-1"><span></span><span></span><span></span></div></div>`;
-                chatContainer.appendChild(div);
-                scrollToBottom();
-                return div;
+                chatContainer.appendChild(div); scrollToBottom(); return div;
             }
 
             window.downloadImage = async function(url, btn) {
                 try {
-                    const originalHtml = btn.innerHTML;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    const response = await fetch(url);
-                    const blob = await response.blob();
-                    const blobUrl = window.URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = blobUrl; link.download = `etho-${Date.now()}.jpg`;
+                    const originalHtml = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    const response = await fetch(url); const blob = await response.blob(); const blobUrl = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a'); link.href = blobUrl; link.download = `etho-${Date.now()}.jpg`;
                     document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                    btn.innerHTML = '<i class="fas fa-check"></i>';
-                    setTimeout(() => btn.innerHTML = originalHtml, 2000);
+                    btn.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => btn.innerHTML = originalHtml, 2000);
                 } catch (e) { btn.innerHTML = '<i class="fas fa-exclamation"></i>'; }
             }
 
@@ -345,8 +281,7 @@
                 const prompt = promptInput.value.trim();
                 if (!prompt) { if(mode==='image') alert('Enter image description'); return; }
                 if(welcomeMessage) welcomeMessage.style.display = 'none';
-                addMessage(prompt, 'user');
-                promptInput.value = ''; promptInput.disabled = true;
+                addMessage(prompt, 'user'); promptInput.value = ''; promptInput.disabled = true;
                 const loadingDiv = showLoading();
                 const apiUrl = mode === 'text' ? API_TEXT : API_IMAGE;
                 try {
@@ -369,6 +304,14 @@
             textBtn.addEventListener('click', () => handleSubmission('text'));
             imgBtn.addEventListener('click', () => handleSubmission('image'));
             promptInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSubmission('text'); });
+            window.addEventListener('resize', () => {
+                if(window.innerWidth >= 768) { 
+                    overlay.classList.add('hidden'); sidebar.classList.remove('-translate-x-full'); sidebar.classList.add('md:translate-x-0');
+                    mainContent.classList.add('md:ml-72'); mainContent.classList.remove('ml-0'); isDesktopSidebarOpen = true;
+                } else {
+                    sidebar.classList.add('-translate-x-full'); mainContent.classList.remove('md:ml-72'); mainContent.classList.remove('ml-0');
+                }
+            });
         });
     </script>
 </body>
