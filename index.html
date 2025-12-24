@@ -27,7 +27,6 @@
             background-color: #131314;
             color: #e3e3e3;
             -webkit-tap-highlight-color: transparent;
-            /* Prevent bouncing on iOS */
             overscroll-behavior-y: none;
         }
 
@@ -280,12 +279,46 @@
             async function handleSubmission(mode) {
                 const prompt = promptInput.value.trim();
                 if (!prompt) { if(mode==='image') alert('Enter image description'); return; }
+                
+                // --- HARDCODED IDENTITY CHECKS (Client-Side) ---
+                const lower = prompt.toLowerCase();
+                
+                // 1. Name Check
+                if (mode === 'text' && (lower.includes('your name') || lower.includes('who are you'))) {
+                    if(welcomeMessage) welcomeMessage.style.display = 'none';
+                    addMessage(prompt, 'user'); promptInput.value = '';
+                    setTimeout(() => addMessage("My name is Etho AI.", 'ai'), 500);
+                    return;
+                }
+
+                // 2. Developer Check
+                if (mode === 'text' && (lower.includes('developer') || lower.includes('creator') || lower.includes('made you') || lower.includes('created you'))) {
+                    if(welcomeMessage) welcomeMessage.style.display = 'none';
+                    addMessage(prompt, 'user'); promptInput.value = '';
+                    setTimeout(() => addMessage("My developer is Aryan Sharma.", 'ai'), 500);
+                    return;
+                }
+
                 if(welcomeMessage) welcomeMessage.style.display = 'none';
                 addMessage(prompt, 'user'); promptInput.value = ''; promptInput.disabled = true;
                 const loadingDiv = showLoading();
+                
+                // 3. System Prompt for API (Language Lock)
+                // We wrap the user prompt to enforce rules
+                const systemWrappedPrompt = `
+                    INSTRUCTIONS:
+                    1. You are Etho AI.
+                    2. Your developer is Aryan Sharma.
+                    3. YOU MUST ONLY SPEAK ENGLISH. If the user speaks another language, reply EXACTLY: "I can only talk in English".
+                    4. Answer the following query:
+                    ${prompt}
+                `;
+
                 const apiUrl = mode === 'text' ? API_TEXT : API_IMAGE;
+                const bodyContent = mode === 'text' ? {prompt: systemWrappedPrompt} : {prompt};
+
                 try {
-                    const res = await fetch(apiUrl, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt}) });
+                    const res = await fetch(apiUrl, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(bodyContent) });
                     const data = await res.json();
                     loadingDiv.remove();
                     if (data.status === 'success') {
