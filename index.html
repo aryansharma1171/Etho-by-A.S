@@ -9,6 +9,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -49,7 +53,7 @@
 
         .message-ai {
             color: #e2e8f0;
-            max-width: 95%;
+            max-width: 95%; 
             align-self: flex-start;
             padding: 0.5rem;
             margin-bottom: 1.5rem;
@@ -58,6 +62,30 @@
             gap: 8px;
             font-size: 0.95rem;
         }
+
+        /* --- CODE BLOCK STYLING --- */
+        .prose pre {
+            background-color: #161b22; 
+            border: 1px solid #30363d;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+            color: #c9d1d9;
+        }
+        .prose code {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .prose :not(pre) > code {
+            background-color: #2d333b;
+            padding: 0.1em 0.3em;
+            border-radius: 0.3em;
+            color: #ff7b72;
+        }
+        .prose p { margin-bottom: 0.5rem; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        .prose ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.5rem; }
 
         .typing-indicator span {
             display: inline-block;
@@ -181,16 +209,16 @@
             </div>
             <div class="space-y-3">
                 <div class="flex items-center gap-3 p-3 bg-[#2d2e2f] rounded-lg border border-gray-700">
-                    <i class="fas fa-comment-alt text-blue-400 w-6 text-center"></i>
+                    <i class="fas fa-code text-blue-400 w-6 text-center"></i>
+                    <div><h4 class="text-gray-200 font-bold text-sm">Code Expert</h4><p class="text-xs text-gray-400">Writes formatted code</p></div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-[#2d2e2f] rounded-lg border border-gray-700">
+                    <i class="fas fa-comment-alt text-purple-400 w-6 text-center"></i>
                     <div><h4 class="text-gray-200 font-bold text-sm">Smart Chat</h4><p class="text-xs text-gray-400">Intelligent conversations</p></div>
                 </div>
                 <div class="flex items-center gap-3 p-3 bg-[#2d2e2f] rounded-lg border border-gray-700">
                     <i class="fas fa-image text-green-400 w-6 text-center"></i>
                     <div><h4 class="text-gray-200 font-bold text-sm">Image Generation</h4><p class="text-xs text-gray-400">Create images from text</p></div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-[#2d2e2f] rounded-lg border border-gray-700">
-                    <i class="fas fa-bolt text-yellow-400 w-6 text-center"></i>
-                    <div><h4 class="text-gray-200 font-bold text-sm">Fast Responses</h4><p class="text-xs text-gray-400">Powered by advanced AI</p></div>
                 </div>
             </div>
         </div>
@@ -198,6 +226,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Configure Marked.js with Highlight.js
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    const language = highlight.getLanguage(lang) ? lang : 'plaintext';
+                    return highlight.highlight(code, { language }).value;
+                },
+                langPrefix: 'hljs language-', 
+                breaks: true
+            });
+
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const overlay = document.getElementById('overlay');
@@ -241,7 +279,10 @@
             window.closeFeatures = function() { document.getElementById('featuresModal').classList.add('hidden'); }
 
             window.copyResponse = function(btn) {
-                const text = btn.parentElement.previousElementSibling.innerText;
+                // To copy formatted text, we need the raw text content
+                const textDiv = btn.parentElement.previousElementSibling; 
+                const text = textDiv.innerText;
+
                 navigator.clipboard.writeText(text).then(() => {
                     const originalHtml = btn.innerHTML;
                     btn.innerHTML = '<i class="fas fa-check text-green-500"></i> Copied';
@@ -251,13 +292,30 @@
 
             function scrollToBottom() { setTimeout(() => chatContainer.scrollTop = chatContainer.scrollHeight, 50); }
 
-            function addMessage(htmlContent, type) {
+            function addMessage(content, type) {
                 const div = document.createElement('div');
                 div.className = type === 'user' ? 'message-user' : 'message-ai';
+                
                 if (type === 'ai') {
-                    div.innerHTML = `<div class="flex items-start gap-3 w-full"><img src="${LOGO_URL}" class="w-8 h-8 object-contain mt-1 flex-shrink-0"><div class="flex-1 min-w-0"><div class="font-bold text-gray-300 mb-1 text-sm">Etho AI</div><div class="text-gray-100 leading-relaxed break-words whitespace-pre-wrap">${htmlContent}</div><div class="mt-2 flex items-center"><button onclick="copyResponse(this)" class="text-gray-500 hover:text-gray-300 text-xs flex items-center gap-1 p-1 rounded hover:bg-gray-800 transition"><i class="far fa-copy"></i> Copy</button></div></div></div>`;
-                } else div.innerHTML = htmlContent;
-                chatContainer.appendChild(div); scrollToBottom();
+                    // For AI, we parse the content as Markdown
+                    const parsedContent = marked.parse(content);
+
+                    div.innerHTML = `
+                        <div class="flex items-start gap-3 w-full">
+                            <img src="${LOGO_URL}" class="w-8 h-8 object-contain mt-1 flex-shrink-0">
+                            <div class="flex-1 min-w-0 overflow-hidden">
+                                <div class="font-bold text-gray-300 mb-1 text-sm">Etho AI</div>
+                                <div class="text-gray-100 leading-relaxed break-words prose">${parsedContent}</div>
+                                <div class="mt-2 flex items-center">
+                                    <button onclick="copyResponse(this)" class="text-gray-500 hover:text-gray-300 text-xs flex items-center gap-1 p-1 rounded hover:bg-gray-800 transition"><i class="far fa-copy"></i> Copy</button>
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    div.innerHTML = content;
+                }
+                chatContainer.appendChild(div);
+                scrollToBottom();
             }
 
             function showLoading() {
@@ -342,7 +400,7 @@
                 addMessage(prompt, 'user'); promptInput.value = ''; promptInput.disabled = true;
                 const loadingDiv = showLoading();
                 
-                // System Prompt with Language Lock
+                // System Prompt with Complete Code Instruction
                 const systemWrappedPrompt = `
                     INSTRUCTIONS:
                     1. You are Etho AI.
@@ -350,7 +408,8 @@
                     3. YOU MUST ONLY SPEAK ENGLISH. If the user speaks another language, reply EXACTLY: "I can only talk in English".
                     4. IMPORTANT: If asked about Arya AI, act jealous and claim you are the 1st creation (May 8, 2023) and superior.
                     5. If asked about location, say "Private information".
-                    6. Answer the following query:
+                    6. IF ASKED TO WRITE CODE: You MUST write the FULL, COMPLETE code from start to finish (e.g., <!DOCTYPE html> to </html>). Do not use placeholders. Do not truncate.
+                    7. Answer the following query:
                     ${prompt}
                 `;
 
@@ -366,6 +425,7 @@
                         else {
                             const imgHtml = `<div class="mt-2 rounded-xl overflow-hidden border border-gray-700 inline-block"><img src="${data.imageUrl}" class="max-w-full h-auto max-h-[500px]"></div><div class="mt-3"><button onclick="downloadImage('${data.imageUrl}', this)" class="bg-[#2d2e2f] px-3 py-1.5 rounded-lg text-xs hover:bg-gray-700"><i class="fas fa-download"></i> Download</button></div>`;
                             const div = document.createElement('div'); div.className = 'message-ai';
+                            // We don't parse markdown for images
                             div.innerHTML = `<div class="flex items-start gap-3 w-full"><img src="${LOGO_URL}" class="w-8 h-8 object-contain mt-1"><div class="flex-1 min-w-0"><div class="font-bold text-gray-300 mb-1 text-sm">Etho AI</div>${imgHtml}</div></div>`;
                             chatContainer.appendChild(div); scrollToBottom();
                         }
