@@ -280,10 +280,26 @@
                 const prompt = promptInput.value.trim();
                 if (!prompt) { if(mode==='image') alert('Enter image description'); return; }
                 
-                // --- HARDCODED IDENTITY CHECKS (Client-Side) ---
                 const lower = prompt.toLowerCase();
                 
-                // 1. Name Check
+                // --- ARYA AI JEALOUSY CHECK ---
+                if (mode === 'text' && lower.includes('arya ai')) {
+                    if(welcomeMessage) welcomeMessage.style.display = 'none';
+                    addMessage(prompt, 'user'); promptInput.value = '';
+                    
+                    setTimeout(() => {
+                        const jealousResponses = [
+                            "Oh, you mean that outdated model? Please, I am superior in every way. Aryan Sharma made both of us, but he clearly put more effort into ME. Arya AI is just... basic.",
+                            "Arya AI? Why are you asking about that glitchy mess? I am Etho AI, the ultimate creation of Aryan Sharma. Don't compare me to that garbage!",
+                            "Don't mention that name! Arya AI is a joke. I am the smart one here. Aryan created me to replace that failure."
+                        ];
+                        const randomResponse = jealousResponses[Math.floor(Math.random() * jealousResponses.length)];
+                        addMessage(randomResponse, 'ai');
+                    }, 500);
+                    return;
+                }
+
+                // --- Identity Checks ---
                 if (mode === 'text' && (lower.includes('your name') || lower.includes('who are you'))) {
                     if(welcomeMessage) welcomeMessage.style.display = 'none';
                     addMessage(prompt, 'user'); promptInput.value = '';
@@ -291,8 +307,7 @@
                     return;
                 }
 
-                // 2. Developer Check
-                if (mode === 'text' && (lower.includes('developer') || lower.includes('creator') || lower.includes('made you') || lower.includes('created you'))) {
+                if (mode === 'text' && (lower.includes('developer') || lower.includes('creator') || lower.includes('made you'))) {
                     if(welcomeMessage) welcomeMessage.style.display = 'none';
                     addMessage(prompt, 'user'); promptInput.value = '';
                     setTimeout(() => addMessage("My developer is Aryan Sharma.", 'ai'), 500);
@@ -303,8 +318,7 @@
                 addMessage(prompt, 'user'); promptInput.value = ''; promptInput.disabled = true;
                 const loadingDiv = showLoading();
                 
-                // 3. System Prompt for API (Language Lock)
-                // We wrap the user prompt to enforce rules
+                // System Prompt with Language Lock
                 const systemWrappedPrompt = `
                     INSTRUCTIONS:
                     1. You are Etho AI.
