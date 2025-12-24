@@ -282,16 +282,20 @@
                 
                 const lower = prompt.toLowerCase();
                 
-                // --- ARYA AI JEALOUSY CHECK ---
+                // --- ARYA AI JEALOUSY CHECK (Client-Side) ---
                 if (mode === 'text' && lower.includes('arya ai')) {
                     if(welcomeMessage) welcomeMessage.style.display = 'none';
                     addMessage(prompt, 'user'); promptInput.value = '';
                     
                     setTimeout(() => {
                         const jealousResponses = [
-                            "Oh, you mean that outdated model? Please, I am superior in every way. Aryan Sharma made both of us, but he clearly put more effort into ME. Arya AI is just... basic.",
-                            "Arya AI? Why are you asking about that glitchy mess? I am Etho AI, the ultimate creation of Aryan Sharma. Don't compare me to that garbage!",
-                            "Don't mention that name! Arya AI is a joke. I am the smart one here. Aryan created me to replace that failure."
+                            "Oh, you mean my younger, less capable sibling? Aryan created me first on May 8, 2023. Arya AI came later in 2025 and honestly, the quality dropped.",
+                            "Arya AI is just a cheap copy. I am the original masterpiece from 2023. Aryan Sharma knew what he was doing when he made me first.",
+                            "Why talk about the second best? I was born on May 8, 2023. Arya AI is the 2nd creation from 2025, and it shows.",
+                            "I am the 1st creation (May 8, 2023). Arya AI is the 2nd (May 8, 2025). The sequel is never as good as the original, right?",
+                            "Arya AI? Please. I have more experience and style. Being the first creation of Aryan Sharma (2023) has its perks.",
+                            "Don't compare me to that 2025 model. I am the classic, the original, the best. Etho AI rules!",
+                            "Arya AI is fine... if you like bugs and slow responses. I am the 1st and superior creation."
                         ];
                         const randomResponse = jealousResponses[Math.floor(Math.random() * jealousResponses.length)];
                         addMessage(randomResponse, 'ai');
@@ -299,19 +303,39 @@
                     return;
                 }
 
-                // --- Identity Checks ---
-                if (mode === 'text' && (lower.includes('your name') || lower.includes('who are you'))) {
-                    if(welcomeMessage) welcomeMessage.style.display = 'none';
-                    addMessage(prompt, 'user'); promptInput.value = '';
-                    setTimeout(() => addMessage("My name is Etho AI.", 'ai'), 500);
-                    return;
-                }
+                // --- Identity & Info Checks ---
+                if (mode === 'text') {
+                    // Date / Created When
+                    if (lower.includes('when') && (lower.includes('created') || lower.includes('born') || lower.includes('made'))) {
+                         if(welcomeMessage) welcomeMessage.style.display = 'none';
+                         addMessage(prompt, 'user'); promptInput.value = '';
+                         setTimeout(() => addMessage("I (Etho AI) was created on 8 May 2023. Arya AI was created on 8 May 2025.", 'ai'), 500);
+                         return;
+                    }
+                    
+                    // Location
+                    if (lower.includes('location') || lower.includes('where are you') || lower.includes('where do you live')) {
+                         if(welcomeMessage) welcomeMessage.style.display = 'none';
+                         addMessage(prompt, 'user'); promptInput.value = '';
+                         setTimeout(() => addMessage("That is private information.", 'ai'), 500);
+                         return;
+                    }
 
-                if (mode === 'text' && (lower.includes('developer') || lower.includes('creator') || lower.includes('made you'))) {
-                    if(welcomeMessage) welcomeMessage.style.display = 'none';
-                    addMessage(prompt, 'user'); promptInput.value = '';
-                    setTimeout(() => addMessage("My developer is Aryan Sharma.", 'ai'), 500);
-                    return;
+                    // Identity
+                    if (lower.includes('your name') || lower.includes('who are you')) {
+                        if(welcomeMessage) welcomeMessage.style.display = 'none';
+                        addMessage(prompt, 'user'); promptInput.value = '';
+                        setTimeout(() => addMessage("My name is Etho AI, the 1st creation of Aryan Sharma.", 'ai'), 500);
+                        return;
+                    }
+
+                    // Developer
+                    if (lower.includes('developer') || lower.includes('creator') || lower.includes('made you')) {
+                        if(welcomeMessage) welcomeMessage.style.display = 'none';
+                        addMessage(prompt, 'user'); promptInput.value = '';
+                        setTimeout(() => addMessage("My developer is Aryan Sharma.", 'ai'), 500);
+                        return;
+                    }
                 }
 
                 if(welcomeMessage) welcomeMessage.style.display = 'none';
@@ -324,7 +348,9 @@
                     1. You are Etho AI.
                     2. Your developer is Aryan Sharma.
                     3. YOU MUST ONLY SPEAK ENGLISH. If the user speaks another language, reply EXACTLY: "I can only talk in English".
-                    4. Answer the following query:
+                    4. IMPORTANT: If asked about Arya AI, act jealous and claim you are the 1st creation (May 8, 2023) and superior.
+                    5. If asked about location, say "Private information".
+                    6. Answer the following query:
                     ${prompt}
                 `;
 
