@@ -6,8 +6,8 @@
     <title>Etho AI</title>
     <meta name="theme-color" content="#131314">
     
-    <!-- Embedded PWA Manifest -->
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiRXRobyBBSSIsInNob3J0X25hbWUiOiJFdGhvIEFJIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMzEzMTQiLCJ0aGVtZV9jb2xvciI6IiMxMzEzMTQiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2FyeWFuc2hhcm1hMTE3MS93ZWJpbWFnZXMvbWFpbi9FdGhvJTIwYWklMjBsb2dvLndlYnAiLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2Uvd2VicCIsInB1cnBvc2UiOiJhbnkgbWFza2FibGUifV19">
+    <!-- Link to external PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
     
     <!-- Mobile Web App Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -338,7 +338,7 @@
                 // Stash the event so it can be triggered later.
                 deferredPrompt = e;
                 // Update UI to notify the user they can install the PWA
-                installBtn.classList.remove('hidden');
+                if(installBtn) installBtn.classList.remove('hidden');
             });
 
             window.installPWA = async function() {
@@ -352,16 +352,13 @@
                 }
             };
 
-            // Register a dummy service worker to satisfy Android Chrome's PWA requirements
+            // Register the actual sw.js file for PWA support
             if ('serviceWorker' in navigator) {
-                const swContent = `
-                    self.addEventListener('install', (e) => self.skipWaiting());
-                    self.addEventListener('activate', (e) => self.clients.claim());
-                    self.addEventListener('fetch', (e) => {});
-                `;
-                const blob = new Blob([swContent], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW registration fallback needed for strict hosts', err));
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(registration => console.log('ServiceWorker registration successful'))
+                        .catch(err => console.log('ServiceWorker registration failed: ', err));
+                });
             }
 
             // --- Voice Recognition Setup ---
