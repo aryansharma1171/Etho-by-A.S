@@ -179,7 +179,7 @@
                     <i class="fas fa-bars text-xl"></i>
                 </button>
                 <div class="flex items-center gap-2 select-none">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2103/2103832.png" alt="Etho AI Logo" class="w-8 h-8 object-contain">
+                    <img src="https://raw.githubusercontent.com/aryansharma1171/webimages/main/Etho%20ai%20logo.webp" alt="Etho AI Logo" class="w-8 h-8 object-contain">
                     <h1 class="text-lg md:text-xl font-semibold text-gray-100 tracking-tight">Etho AI</h1>
                 </div>
             </div>
@@ -188,7 +188,7 @@
         <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:px-20 lg:px-40 flex flex-col space-y-6 scroll-smooth">
             <div id="welcome-message" class="message-ai mt-4 md:mt-10">
                 <div class="flex items-center gap-3 mb-4">
-                     <img src="https://cdn-icons-png.flaticon.com/512/2103/2103832.png" alt="Logo" class="w-12 h-12 object-contain animate-pulse">
+                     <img src="https://raw.githubusercontent.com/aryansharma1171/webimages/main/Etho%20ai%20logo.webp" alt="Logo" class="w-12 h-12 object-contain animate-pulse">
                 </div>
                 <h2 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Hello, Human.</h2>
                 <p class="text-lg md:text-xl text-gray-400">How can Etho AI help you today?</p>
@@ -222,7 +222,7 @@
 
         <div class="flex-1 flex flex-col items-center justify-center w-full">
             <div class="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-[0_0_50px_rgba(59,130,246,0.5)] mb-10 animate-pulse-slow">
-                <img src="https://cdn-icons-png.flaticon.com/512/2103/2103832.png" alt="Etho Voice" class="w-20 h-20 object-contain">
+                <img src="https://raw.githubusercontent.com/aryansharma1171/webimages/main/Etho%20ai%20logo.webp" alt="Etho Voice" class="w-20 h-20 object-contain">
             </div>
             
             <h2 id="voiceStatus" class="text-2xl font-bold text-gray-200 mb-2">Listening...</h2>
@@ -307,7 +307,7 @@
             let isListening = false;
             let synth = window.speechSynthesis;
 
-            const LOGO_URL = "https://cdn-icons-png.flaticon.com/512/2103/2103832.png";
+            const LOGO_URL = "https://raw.githubusercontent.com/aryansharma1171/webimages/main/Etho%20ai%20logo.webp";
             const API_TEXT = 'https://backend.buildpicoapps.com/aero/run/llm-api?pk=v1-Z0FBQUFBQnBTOHRUbklTeGdKR3M2TXhCR0xfNjRNWDlTMG51cTRkczl1dzFHQVRHX3RtYmhPSnVtQ1ZTbGY3ZzdINHdlYkZyamR2QW5zZDVaS053S2xrOEoyRWx5NFh4S0E9PQ==';
             const API_IMAGE = 'https://backend.buildpicoapps.com/aero/run/image-generation-api?pk=v1-Z0FBQUFBQnBTOHRUTUUtUmltRjcxN0V6QU5zVmpxeVNPTzRzR0FVLTRpcUIwaHlTQmF1VHk1cm9mdXJSVmtfRXJQR3FwVm9US1h5WTlGSzZiRzhjMXdTNXJmUzVyQkNEeWc9PQ==';
 
@@ -409,8 +409,7 @@
                     INSTRUCTIONS:
                     1. You are Etho AI.
                     2. Keep answers short and conversational for voice chat.
-                    3. ONLY SPEAK ENGLISH.
-                    4. Answer: ${text}
+                    3. Answer: ${text}
                 `;
 
                 try {
@@ -564,11 +563,10 @@
                     INSTRUCTIONS:
                     1. You are Etho AI.
                     2. Your developer is Aryan Sharma.
-                    3. YOU MUST ONLY SPEAK ENGLISH. If the user speaks another language, reply EXACTLY: "I can only talk in English".
-                    4. IMPORTANT: If asked about Arya AI, act jealous and claim you are the 1st creation (May 8, 2023) and superior.
-                    5. If asked about location, say "Private information".
-                    6. IF ASKED TO WRITE CODE: You MUST write the FULL, COMPLETE code from start to finish (e.g., <!DOCTYPE html> to </html>). Do not use placeholders. Do not truncate.
-                    7. Answer the following query:
+                    3. IMPORTANT: If asked about Arya AI, act jealous and claim you are the 1st creation (May 8, 2023) and superior.
+                    4. If asked about location, say "Private information".
+                    5. IF ASKED TO WRITE CODE: You MUST write the FULL, COMPLETE code from start to finish (e.g., <!DOCTYPE html> to </html>). Do not use placeholders. Do not truncate.
+                    6. Answer the following query:
                     ${prompt}
                 `;
 
