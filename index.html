@@ -6,7 +6,10 @@
     <title>Etho AI</title>
     <meta name="theme-color" content="#131314">
     
-    <!-- PWA / Home Screen Icons -->
+    <!-- Embedded PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiRXRobyBBSSIsInNob3J0X25hbWUiOiJFdGhvIEFJIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMxMzEzMTQiLCJ0aGVtZV9jb2xvciI6IiMxMzEzMTQiLCJpY29ucyI6W3sic3JjIjoiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2FyeWFuc2hhcm1hMTE3MS93ZWJpbWFnZXMvbWFpbi9FdGhvJTIwYWklMjBsb2dvLndlYnAiLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2Uvd2VicCIsInB1cnBvc2UiOiJhbnkgbWFza2FibGUifV19">
+    
+    <!-- Mobile Web App Meta Tags -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -158,11 +161,18 @@
                     </div>
                     <span>Features</span>
                 </button>
-                <button onclick="openVoiceMode()" class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-[#2d2e2f] rounded-lg transition flex items-center gap-3 group active:bg-gray-800">
+                <button onclick="openVoiceMode()" class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-[#2d2e2f] rounded-lg transition flex items-center gap-3 group active:bg-gray-800 mb-2">
                     <div class="w-8 h-8 rounded-full bg-purple-900/30 flex items-center justify-center text-purple-400 group-hover:bg-purple-900/50 transition">
                         <i class="fas fa-microphone text-xs"></i>
                     </div>
                     <span>Voice Chat</span>
+                </button>
+                <!-- Install App Button (Hidden by default, shown by JS when PWA is ready) -->
+                <button id="installBtn" onclick="installPWA()" class="hidden w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-[#2d2e2f] rounded-lg transition flex items-center gap-3 group active:bg-gray-800">
+                    <div class="w-8 h-8 rounded-full bg-green-900/30 flex items-center justify-center text-green-400 group-hover:bg-green-900/50 transition">
+                        <i class="fas fa-download text-xs"></i>
+                    </div>
+                    <span>Install App</span>
                 </button>
             </div>
         </div>
@@ -309,15 +319,50 @@
             const voiceTranscript = document.getElementById('voiceTranscript');
             const voiceWaves = document.getElementById('voiceWaves');
             const micBtn = document.getElementById('micBtn');
+            const installBtn = document.getElementById('installBtn');
             
             let isDesktopSidebarOpen = true;
             let recognition;
             let isListening = false;
             let synth = window.speechSynthesis;
+            let deferredPrompt;
 
             const LOGO_URL = "https://raw.githubusercontent.com/aryansharma1171/webimages/main/Etho%20ai%20logo.webp";
             const API_TEXT = 'https://backend.buildpicoapps.com/aero/run/llm-api?pk=v1-Z0FBQUFBQnBTOHRUbklTeGdKR3M2TXhCR0xfNjRNWDlTMG51cTRkczl1dzFHQVRHX3RtYmhPSnVtQ1ZTbGY3ZzdINHdlYkZyamR2QW5zZDVaS053S2xrOEoyRWx5NFh4S0E9PQ==';
             const API_IMAGE = 'https://backend.buildpicoapps.com/aero/run/image-generation-api?pk=v1-Z0FBQUFBQnBTOHRUTUUtUmltRjcxN0V6QU5zVmpxeVNPTzRzR0FVLTRpcUIwaHlTQmF1VHk1cm9mdXJSVmtfRXJQR3FwVm9US1h5WTlGSzZiRzhjMXdTNXJmUzVyQkNEeWc9PQ==';
+
+            // --- PWA Installation Logic ---
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault();
+                // Stash the event so it can be triggered later.
+                deferredPrompt = e;
+                // Update UI to notify the user they can install the PWA
+                installBtn.classList.remove('hidden');
+            });
+
+            window.installPWA = async function() {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installBtn.classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                }
+            };
+
+            // Register a dummy service worker to satisfy Android Chrome's PWA requirements
+            if ('serviceWorker' in navigator) {
+                const swContent = `
+                    self.addEventListener('install', (e) => self.skipWaiting());
+                    self.addEventListener('activate', (e) => self.clients.claim());
+                    self.addEventListener('fetch', (e) => {});
+                `;
+                const blob = new Blob([swContent], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW registration fallback needed for strict hosts', err));
+            }
 
             // --- Voice Recognition Setup ---
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -355,7 +400,7 @@
 
             // --- Voice Functions ---
             window.openVoiceMode = function() {
-                if(window.innerWidth < 768) toggleSidebar(); // Close sidebar on mobile
+                if(window.innerWidth < 768) toggleSidebar(); 
                 voiceModal.classList.remove('hidden');
             }
 
@@ -379,12 +424,11 @@
                 if (synth.speaking) synth.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 
-                // Try to select a female voice
                 const voices = synth.getVoices();
                 const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Google US English') || v.name.includes('Samantha'));
                 if(femaleVoice) utterance.voice = femaleVoice;
                 
-                utterance.pitch = 1.1; // Slightly higher pitch for female tone
+                utterance.pitch = 1.1; 
                 utterance.rate = 1.0;
                 
                 utterance.onstart = () => {
@@ -401,10 +445,8 @@
 
             async function handleVoiceQuery(text) {
                 voiceStatus.innerText = "Thinking...";
-                // Logic Reuse for Voice
                 const lower = text.toLowerCase();
                 
-                // Quick Checks
                 if (lower.includes('arya ai')) {
                     const reply = "Oh, you mean my younger, less capable sibling? Aryan created me first on May 8, 2023. Arya AI came later in 2025 and honestly, the quality dropped.";
                     speak(reply); return;
@@ -412,7 +454,6 @@
                 if (lower.includes('your name')) { speak("My name is Etho AI, the first creation of Aryan Sharma."); return; }
                 if (lower.includes('developer')) { speak("My developer is Aryan Sharma."); return; }
 
-                // API Call
                 const systemWrappedPrompt = `
                     INSTRUCTIONS:
                     1. You are Etho AI.
